@@ -719,4 +719,38 @@ public class BasicParserFilteringTest extends BaseTest
         );
         assertEquals(a2q("[{'empty_array':[]}]"), readAndWrite(JSON_F, p));
     }
+
+    public void testExcludeObjectAtTheBeginningOfArray() throws Exception {
+        JsonParser p0 = JSON_F.createParser(a2q(
+                "{'parent':[{'exclude':false},{'include':true}]}"));
+        JsonParser p = new FilteringParserDelegate(p0,
+                new NameMatchFilter(new String[] { "include" } ),
+                Inclusion.INCLUDE_ALL_AND_PATH,
+                false // multipleMatches
+        );
+        assertEquals(a2q("{'parent':[{'include':true}]}"), readAndWrite(JSON_F, p));
+
+    }
+
+    public void testExcludeObjectAtTheEndOfArray() throws Exception {
+        JsonParser p0 = JSON_F.createParser(a2q(
+                "{'parent':[{'include':true},{'exclude':false}]}"));
+        JsonParser p = new FilteringParserDelegate(p0,
+                new NameMatchFilter(new String[] { "include" } ),
+                Inclusion.INCLUDE_ALL_AND_PATH,
+                false // multipleMatches
+        );
+        assertEquals(a2q("{'parent':[{'include':true}]}"), readAndWrite(JSON_F, p));
+    }
+
+    public void testExcludeObjectInMiddleOfArray() throws Exception {
+        JsonParser p0 = JSON_F.createParser(a2q(
+                "{'parent':[{'include-1':1},{'skip':0},{'include-2':2}]}"));
+        JsonParser p = new FilteringParserDelegate(p0,
+                new NameMatchFilter(new String[]{"include-1", "include-2"}),
+                Inclusion.INCLUDE_ALL_AND_PATH,
+                true // multipleMatches
+        );
+        assertEquals(a2q("{'parent':[{'include-1':1},{'include-2':2}]}"), readAndWrite(JSON_F, p));
+    }
 }

@@ -781,6 +781,9 @@ public class FilteringParserDelegate extends JsonParserDelegate
                 if (returnEnd) {
                     return t;
                 }
+                if (gotEnd) {
+                    return null;
+                }
             }
             continue main_loop;
 
